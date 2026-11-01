@@ -1,0 +1,9 @@
+{"run_id": "mock1", "results": [
+  {"src": "h1", "dst": "h2", "sent": 100, "received": 94, "loss_pct": 6.0,
+   "rtt_min_ms": 21.0, "rtt_avg_ms": 24.3, "rtt_max_ms": 31.2, "jitter_ms": 2.1,
+   "probes": [
+     {"seq": 1, "rtt_ms": 22.4, "lost": false, "timestamp": 1730000000.1},
+     {"seq": 2, "rtt_ms": null, "lost": true, "timestamp": 1730000000.3}
+   ]}
+]}
+

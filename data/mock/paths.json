@@ -1,0 +1,4 @@
+{"pairs": [{"src": "h1", "dst": "h2",
+  "active_path": ["s1","s2","s4"],
+  "alternative_paths": [["s1","s3","s4"]],
+  "hop_counts": {"s1-s2-s4": 3, "s1-s3-s4": 3}}]}
