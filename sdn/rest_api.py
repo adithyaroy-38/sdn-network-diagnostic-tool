@@ -47,6 +47,9 @@ class SDNRestAPI(app_manager.RyuApp):
             {REST_API_NAME: self}
         )
 
+        # Store incoming probe reports in memory.
+        self.reports = []
+
         self.logger.info("SDN REST API initialized")
 
 
@@ -171,3 +174,118 @@ class SDNRestController(ControllerBase):
             return self.json_response({
                 "error": str(error)
             }, 500)
+
+
+    # POST /diag/report
+    @route(
+        "diag_report",
+        "/diag/report",
+        methods=["POST"]
+    )
+    def post_report(self, req, **kwargs):
+
+        # Parse the incoming JSON report.
+        try:
+            report = req.json
+        except Exception:
+            return self.json_response({
+                "error": "Request must contain valid JSON."
+            }, 400)
+
+        if not isinstance(report, dict):
+            return self.json_response({
+                "error": "JSON body must be an object."
+            }, 400)
+
+        required_fields = [
+            "src",
+            "dst",
+            "loss_pct",
+            "rtt_avg_ms",
+            "status",
+            "timestamp"
+        ]
+
+        missing = [
+            field for field in required_fields
+            if field not in report
+        ]
+
+        if missing:
+            return self.json_response({
+                "error": "Missing required fields.",
+                "missing_fields": missing
+            }, 400)
+
+        src = report["src"]
+        dst = report["dst"]
+        loss = report["loss_pct"]
+        rtt = report["rtt_avg_ms"]
+        status = report["status"]
+        timestamp = report["timestamp"]
+
+        # Validate source and destination.
+        if (
+            src not in HOST_SWITCH
+            or dst not in HOST_SWITCH
+            or src == dst
+        ):
+            return self.json_response({
+                "error": "Invalid source or destination."
+            }, 400)
+
+        # Validate packet loss.
+        if (
+            isinstance(loss, bool)
+            or not isinstance(loss, (int, float))
+            or not 0 <= loss <= 100
+        ):
+            return self.json_response({
+                "error": "loss_pct must be between 0 and 100."
+            }, 400)
+
+        # Validate average RTT. None is allowed when no probes succeed.
+        if rtt is not None:
+            if (
+                isinstance(rtt, bool)
+                or not isinstance(rtt, (int, float))
+                or rtt < 0
+            ):
+                return self.json_response({
+                    "error": "rtt_avg_ms must be a non-negative number or null."
+                }, 400)
+
+        # Validate status and timestamp.
+        if status not in ("ok", "degraded", "failed"):
+            return self.json_response({
+                "error": "Invalid status."
+            }, 400)
+
+        if (
+            isinstance(timestamp, bool)
+            or not isinstance(timestamp, (int, float))
+        ):
+            return self.json_response({
+                "error": "timestamp must be numeric."
+            }, 400)
+
+        # Store the accepted report.
+        self.rest_app.reports.append(report)
+
+        # Keep the in-memory history bounded.
+        if len(self.rest_app.reports) > 1000:
+            self.rest_app.reports.pop(0)
+
+        self.rest_app.logger.info(
+            "Probe report received: %s -> %s | loss=%.2f%% | RTT=%s ms | status=%s",
+            src,
+            dst,
+            loss,
+            rtt,
+            status
+        )
+
+        # Dynamic rerouting will be added in a later stage.
+        return self.json_response({
+            "action": "none"
+        })
