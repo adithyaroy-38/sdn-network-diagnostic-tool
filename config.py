@@ -1,7 +1,21 @@
 # Topology
 HOSTS = {"h1": "10.0.0.1", "h2": "10.0.0.2", "h3": "10.0.0.3", "h4": "10.0.0.4"}
 SWITCHES = ["s1", "s2", "s3", "s4"]
+# Host-to-switch mapping
+HOST_SWITCH = {
+    "h1": "s1",
+    "h2": "s4",
+    "h3": "s2",
+    "h4": "s3"
+}
 
+# Switch-to-switch links and delays (milliseconds)
+SWITCH_LINKS = [
+    ("s1", "s2", 5),
+    ("s2", "s4", 5),
+    ("s1", "s3", 20),
+    ("s3", "s4", 20)
+]
 # Probe settings
 ECHO_PORT = 9999
 PROBES_PER_DEST = 100
