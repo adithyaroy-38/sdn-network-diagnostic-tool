@@ -1,11 +1,18 @@
 
 import json
+import os
 from pathlib import Path
 
 
-# Find the project and mock data folders
+# Find the project and selected data folder
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-DATA_FOLDER = PROJECT_DIR / "data" / "mock"
+
+DATASET = os.getenv("SDN_DATASET", "mock")
+
+if DATASET not in ("mock", "live"):
+    raise ValueError("SDN_DATASET must be either 'mock' or 'live'")
+
+DATA_FOLDER = PROJECT_DIR / "data" / DATASET
 
 
 # Load JSON files safely
