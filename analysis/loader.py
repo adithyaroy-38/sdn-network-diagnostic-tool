@@ -86,11 +86,18 @@ def validate_measurements(data):
         if result["received"] > result["sent"]:
             raise ValueError("Received probes cannot exceed sent probes")
 
+
         for field in [
             "loss_pct", "rtt_min_ms", "rtt_avg_ms",
             "rtt_max_ms", "jitter_ms"
         ]:
             value = result[field]
+
+            if value is None and field in [
+                "rtt_min_ms", "rtt_avg_ms",
+                "rtt_max_ms", "jitter_ms"
+            ]:
+                continue
 
             if isinstance(value, bool) or not isinstance(value, (int, float)):
                 raise ValueError(f"{field} must be numeric")
