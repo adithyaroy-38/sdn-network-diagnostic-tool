@@ -9,9 +9,13 @@ DATA_FOLDER = PROJECT_DIR / "data" / "mock"
 
 
 # Load JSON files safely
-def load_json(filename):
+def load_json(filename, mock=True):
 
-    filepath = DATA_FOLDER / filename
+    if mock:
+        filepath = DATA_FOLDER / filename
+    else:
+        filepath = PROJECT_DIR / "data" / filename
+
 
     # Check whether file exists
     if not filepath.is_file():

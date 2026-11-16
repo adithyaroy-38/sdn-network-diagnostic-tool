@@ -73,16 +73,25 @@ def display_results(results):
 # Main program
 def main():
 
-    measurements = load_json("measurements.json")
     paths = load_json("paths.json")
 
-    results = correlate_data(measurements, paths)
+    measurement_files = [
+        ("S0 BASELINE", "baseline_S0.json"),
+        ("ADDITIONAL MEASUREMENT", "measurements.json")
+    ]
 
-    if not results:
-        print("No matching measurements and paths found.")
-        return
+    for label, filename in measurement_files:
 
-    display_results(results)
+        print(f"\n{label}")
+
+        measurements = load_json(filename, mock=False)
+
+        results = correlate_data(measurements, paths)
+
+        if not results:
+            print("No matching measurements and paths found.")
+        else:
+            display_results(results)
 
 
 if __name__ == "__main__":

@@ -127,19 +127,27 @@ def display_failures(results):
 
 def main():
 
-    measurements = load_json("measurements.json")
     topology = load_json("topology.json")
     paths = load_json("paths.json")
 
-    results = detect_failures(
-        measurements,
-        topology,
-        paths
-    )
+    measurement_files = [
+        ("S0 BASELINE", "baseline_S0.json"),
+        ("ADDITIONAL MEASUREMENT", "measurements.json")
+    ]
 
-    display_failures(results)
+    for label, filename in measurement_files:
 
+        print(f"\n{label}")
 
+        measurements = load_json(filename, mock=False)
+
+        results = detect_failures(
+            measurements,
+            topology,
+            paths
+        )
+
+        display_failures(results)
 if __name__ == "__main__":
 
     try:
