@@ -3,19 +3,22 @@ Custom SDN Controller
 Project: Network Diagnostic and Path Analysis Tool
 """
 
-from ryu.app import simple_switch_13
-from ryu.controller.handler import MAIN_DISPATCHER, set_ev_cls
+from ryu.base import app_manager
+from ryu.controller import ofp_event
+from ryu.controller.handler import (
+    MAIN_DISPATCHER,
+    CONFIG_DISPATCHER,
+    set_ev_cls
+)
 from ryu.ofproto import ofproto_v1_3
 from ryu.lib import stplib
 from ryu.lib import dpid as dpid_lib
 from ryu.lib.packet import packet, ethernet, ether_types
 
-from ryu import cfg
-
 from config import SWITCHES
 
 
-class SDNController(simple_switch_13.SimpleSwitch13):
+class SDNController(app_manager.RyuApp):
 
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
@@ -50,6 +53,58 @@ class SDNController(simple_switch_13.SimpleSwitch13):
         self.logger.info("Custom SDN Controller initialized")
         self.logger.info("OpenFlow 1.3 enabled")
         self.logger.info("STP configured for four switches")
+
+    # Install OpenFlow rules
+    def add_flow(self, datapath, priority, match, actions):
+
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        instructions = [
+            parser.OFPInstructionActions(
+                ofproto.OFPIT_APPLY_ACTIONS,
+                actions
+            )
+        ]
+
+        mod = parser.OFPFlowMod(
+            datapath=datapath,
+            priority=priority,
+            match=match,
+            instructions=instructions
+        )
+
+        datapath.send_msg(mod)
+
+    # Handle switch connection and install table-miss flow
+    @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
+    def switch_features_handler(self, ev):
+
+        datapath = ev.msg.datapath
+
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        match = parser.OFPMatch()
+
+        actions = [
+            parser.OFPActionOutput(
+                ofproto.OFPP_CONTROLLER,
+                ofproto.OFPCML_NO_BUFFER
+            )
+        ]
+
+        self.add_flow(
+            datapath,
+            0,
+            match,
+            actions
+        )
+
+        self.logger.info(
+            "Table-miss flow installed on switch %s",
+            datapath.id
+        )
 
     # Handle incoming Ethernet packets
     @set_ev_cls(stplib.EventPacketIn, MAIN_DISPATCHER)
