@@ -29,9 +29,9 @@ The collected measurements are reported to a REST API and analysed to identify n
 3. Calculate optimal network paths using Dijkstra's algorithm.
 4. Identify alternative paths between network hosts.
 5. Measure network performance using UDP socket programming.
-6. Detect packet loss, latency, and jitter.
-7. Report diagnostic measurements through a REST API.
-8. Analyse measurements and identify potential network failures.
+## 6. Detect packet loss, latency, and jitter.
+## 7. Report diagnostic measurements through a REST API.
+## 8. Analyse measurements and identify potential network failures.
 
 ## 3. Technologies Used
 
@@ -143,7 +143,7 @@ sdn-network-diagnostic-tool/
 ├── requirements.txt
 └── README.md
 
-6. Installation and Setup
+## 6. Installation and Setup
 Prerequisites
 - Ubuntu Linux.
 - Python 3.
@@ -161,7 +161,7 @@ pip install -r requirements.txt
 If using the existing Ryu virtual environment:
 source ~/ryu-env/bin/activate
 
-7. How to Run the Project
+## 7. How to Run the Project
 The demonstration requires three main environments:
 1. Ryu controller terminal.
 2. Mininet terminal.
@@ -216,7 +216,7 @@ POST	/diag/report	Submit diagnostic measurements
 Example:
 curl http://10.0.0.254:8080/diag/topology
 
-8. Data Analysis
+## 8. Data Analysis
 The analysis module processes collected network information.
 
 Run the JSON data loader:
@@ -231,7 +231,7 @@ SDN_DATASET=live python3 analysis/correlate.py
 Run network failure analysis:
 SDN_DATASET=live python3 analysis/failures.py
 
-9. Testing and Results
+## 9. Testing and Results
 The project was tested using the Mininet-emulated network.
 
 The following scenarios were demonstrated:
@@ -276,7 +276,7 @@ Objective: Identify degraded network conditions.
 Method: Analyse diagnostic measurements and correlate them with network paths.
 
 Expected Result: The analysis module identifies potential network failures and degraded performance.
-10. Key Features
+## 10. Key Features
 - SDN-based network management.
 - Dynamic topology discovery using LLDP.
 - Dijkstra shortest-path calculation.
@@ -287,19 +287,19 @@ Expected Result: The analysis module identifies potential network failures and d
 - JSON-based network data processing.
 - Path and performance correlation.
 - Network failure analysis.
-11. Limitations
+## 11. Limitations
 - The network is emulated using Mininet rather than deployed on physical networking hardware.
 - Diagnostic results depend on the configured topology and network conditions.
 - REST diagnostic reports are currently maintained in memory and are not permanently persisted by the REST service.
 - Network performance measurements may vary depending on the host system and emulation environment.
-12. Future Enhancements
+## 12. Future Enhancements
 - Persistent storage of diagnostic reports.
 - Real-time network monitoring dashboard.
 - Automated rerouting during network failures.
 - Additional network performance metrics.
 - Testing on larger and more complex topologies.
 - Integration with physical SDN-enabled networking hardware.
-13. Conclusion
+## 13. Conclusion
 The SDN Network Diagnostic and Path Analysis Tool demonstrates how Software-Defined Networking can be combined with UDP socket programming to monitor and analyse network performance.
 
 By integrating Ryu, Mininet, LLDP-based topology discovery, Dijkstra path calculation, UDP diagnostics, REST API reporting, and data analysis, the project provides a framework for identifying network performance issues and evaluating communication paths.
